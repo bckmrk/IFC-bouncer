@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ids xmlns="http://standards.buildingsmart.org/IDS" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://standards.buildingsmart.org/IDS http://standards.buildingsmart.org/IDS/1.0/ids.xsd">
   <info>
-    <title>JM - Dörrkrav TypeID och TypeName</title>
+    <title>JM TypeID Dörrkrav</title>
+	<description>Checks all doors for valid JM TypeID</description>
     <author>JM AB</author>
-    <date>2026-03-05</date>
+    <date>2026-04-01</date>
+    <purpose>JM type classification</purpose>
   </info>
   <specifications>
-    <specification
-      name="Dörr - TypeID ska följa namnstandard (VD, SD, D, BGV, EP, ED, FD eller GP)"
-      ifcVersion="IFC2X3 IFC4">
+    <specification name="Dörr - TypeID ska följa namnstandard" ifcVersion="IFC2X3 IFC4">
       <applicability minOccurs="0" maxOccurs="unbounded">
         <entity>
-          <n>
+          <name>
             <simpleValue>IFCDOOR</simpleValue>
-          </n>
+          </name>
         </entity>
       </applicability>
       <requirements>
