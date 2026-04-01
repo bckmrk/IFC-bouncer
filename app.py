@@ -153,7 +153,6 @@ def load_ids_files():
         st.error(f"Mappen {IDS_FOLDER} finns inte!")
     return ids_files
 
-
 # ── Huvudapp ──────────────────────────────────────────────────────────────────
 st.title("🚪 IFC Bouncer")
 st.caption("Ladda upp din IFC-fil och välj vilka IDS-regler du vill validera mot.")
