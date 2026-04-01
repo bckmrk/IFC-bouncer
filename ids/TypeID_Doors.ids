@@ -25,7 +25,9 @@
             <simpleValue>TypeID</simpleValue>
           </baseName>
           <value>
-            <simpleValue>(VD|SD|BGV|EP|ED|FD|GP|D).*</simpleValue>
+		    <xs:restriction base="xs:string">
+            <xs:pattern value="(VD|SD|BGV|EP|ED|FD|GP|D).*"/>
+			</xs:restriction>
           </value>
         </property>
       </requirements>
