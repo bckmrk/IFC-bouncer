@@ -1,2 +1,2 @@
 # IFC-bouncer
-Decider of who has done correct, and who has not. 
+Decider of who shall pass, and who shall not. 
