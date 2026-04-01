@@ -122,33 +122,10 @@ def load_ids_files():
     if IDS_FOLDER.exists():
         for f in sorted(IDS_FOLDER.glob("*.ids")):
             try:
-                import io
-                import sys
-                old_stdout = sys.stdout
-                old_stderr = sys.stderr
-                sys.stdout = io.StringIO()
-                sys.stderr = io.StringIO()
-                
                 ids_obj = ids.open(str(f))
-                
-                stdout_output = sys.stdout.getvalue()
-                stderr_output = sys.stderr.getvalue()
-                sys.stdout = old_stdout
-                sys.stderr = old_stderr
-                
                 ids_files[f.stem] = {"path": f, "ids": ids_obj}
-                
             except Exception as e:
-                stdout_output = sys.stdout.getvalue()
-                stderr_output = sys.stderr.getvalue()
-                sys.stdout = old_stdout
-                sys.stderr = old_stderr
-                
                 st.warning(f"Kunde inte ladda {f.name}: {e}")
-                if stdout_output:
-                    st.code(f"STDOUT:\n{stdout_output}")
-                if stderr_output:
-                    st.code(f"STDERR:\n{stderr_output}")
     else:
         st.error(f"Mappen {IDS_FOLDER} finns inte!")
     return ids_files
