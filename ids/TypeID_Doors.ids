@@ -17,7 +17,7 @@
         </entity>
       </applicability>
       <requirements>
-        <property cardinality="required" dataType="IFCTEXT">
+        <property cardinality="required" dataType="IFCLABEL">
           <propertySet>
             <simpleValue>JM</simpleValue>
           </propertySet>
