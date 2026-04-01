@@ -11,7 +11,7 @@
   <specifications>
     <specification
       name="Dörr - TypeID ska följa namnstandard (VD, SD, D, BGV, EP, ED, FD eller GP)"
-      ifcVersion="IFC2X3">
+      ifcVersion="IFC2X3 IFC4">
       <applicability minOccurs="0" maxOccurs="unbounded">
         <entity>
           <name>
