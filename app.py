@@ -4,11 +4,17 @@ from ifctester import ids, reporter
 import tempfile
 import os
 import glob
+import re
 
 # ── Sidhuvud ──────────────────────────────────────────────────────────────────
 st.set_page_config(page_title="IFC Bouncer 🚪", page_icon="🚪", layout="wide")
 st.title("🚪 IFC Bouncer")
 st.caption("Ladda upp din IFC-fil och välj vilka IDS-regler du vill validera mot.")
+
+# ── Filnamnskontroll ──────────────────────────────────────────────────────────
+def check_filename(filename):
+    pattern = r"^[A-Za-z]-\d{2}-V-\d{2,4}\.ifc$"
+    return re.match(pattern, filename) is not None
 
 # ── Hitta IDS-filer i repot ───────────────────────────────────────────────────
 ids_folder = os.path.join(os.path.dirname(__file__), "ids")
@@ -25,17 +31,27 @@ else:
     selected_ids = st.sidebar.multiselect(
         "Välj IDS-filer att validera mot:",
         options=ids_names,
-        default=ids_names  # välj alla som standard
+        default=ids_names
     )
 
 # ── Ladda upp IFC-fil ─────────────────────────────────────────────────────────
 uploaded_ifc = st.file_uploader("Ladda upp IFC-fil", type=["ifc"])
 
+# ── Filnamnskontroll ──────────────────────────────────────────────────────────
+if uploaded_ifc:
+    if not check_filename(uploaded_ifc.name):
+        st.error(
+            f"❌ Filnamnet följer inte namnkonventionen: `{uploaded_ifc.name}`\n\n"
+            f"Förväntat format: `A-40-V-0000.ifc`"
+        )
+        st.stop()
+    else:
+        st.success(f"✅ Filnamnet är korrekt: `{uploaded_ifc.name}`")
+
 # ── Kör validering ────────────────────────────────────────────────────────────
 if uploaded_ifc and selected_ids:
     if st.button("🚪 Kör validering", type="primary"):
 
-        # Spara IFC-filen temporärt
         with tempfile.NamedTemporaryFile(suffix=".ifc", delete=False) as tmp:
             tmp.write(uploaded_ifc.read())
             tmp_ifc_path = tmp.name
@@ -50,7 +66,6 @@ if uploaded_ifc and selected_ids:
         st.divider()
         st.subheader("📋 Valideringsresultat")
 
-        # Loopa igenom valda IDS-filer
         for ids_name in selected_ids:
             ids_path = os.path.join(ids_folder, ids_name)
             try:
@@ -70,7 +85,6 @@ if uploaded_ifc and selected_ids:
                         icon = "✅" if spec.status else "❌"
                         st.markdown(f"**{icon} {spec.name}**")
                         if not spec.status:
-                            # Visa misslyckade objekt
                             for req in spec.requirements:
                                 for result in (req.failed_entities or []):
                                     st.caption(f"  → {result}")
