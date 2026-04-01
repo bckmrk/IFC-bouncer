@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ids xmlns="http://standards.buildingsmart.org/IDS"
      xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <info>
@@ -12,9 +12,9 @@
       ifcVersion="IFC2X3 IFC4">
       <applicability minOccurs="0" maxOccurs="unbounded">
         <entity>
-          <name>
+          <n>
             <simpleValue>IFCDOOR</simpleValue>
-          </name>
+          </n>
         </entity>
       </applicability>
       <requirements>
