@@ -1,3 +1,7 @@
 streamlit
 ifcopenshell
 ifctester
+numpy
+pandas
+openpyxl
+bcf-client
