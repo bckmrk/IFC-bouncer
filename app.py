@@ -42,7 +42,7 @@ if uploaded_ifc:
     if not check_filename(uploaded_ifc.name):
         st.error(
             f"❌ Filnamnet följer inte namnkonventionen: `{uploaded_ifc.name}`\n\n"
-            f"Förväntat format: `A-40-V-0000.ifc`"
+            f"Förväntat format, exempel: `A-40-V-0000.ifc`"
         )
         st.stop()
     else:
