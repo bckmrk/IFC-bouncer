@@ -130,6 +130,7 @@ def load_ids_files():
         st.error(f"Mappen {IDS_FOLDER} finns inte!")
     return ids_files
 
+
 # ── Huvudapp ──────────────────────────────────────────────────────────────────
 st.title("🚪 IFC Bouncer")
 st.caption("Ladda upp din IFC-fil och välj vilka IDS-regler du vill validera mot.")
@@ -161,28 +162,20 @@ with st.sidebar:
     st.markdown("---")
 
 # ── IDS-filer och val ─────────────────────────────────────────────────────────
-def load_ids_files():
-    ids_files = {}
-    if IDS_FOLDER.exists():
-        for f in sorted(IDS_FOLDER.glob("*.ids")):
-            try:
-                # Försök parsa XML direkt först
-                import xml.etree.ElementTree as ET
-                tree = ET.parse(str(f))
-                root = tree.getroot()
-                st.info(f"XML OK - root tag: {root.tag}")
-                
-                # Försök med ifctester
-                ids_obj = ids.open(str(f))
-                ids_files[f.stem] = {"path": f, "ids": ids_obj}
-                
-            except ET.ParseError as xml_err:
-                st.error(f"XML-fel i {f.name}: {xml_err}")
-            except Exception as e:
-                st.warning(f"ifctester-fel i {f.name}: {type(e).__name__}: {e}")
-    else:
-        st.error(f"Mappen {IDS_FOLDER} finns inte!")
-    return ids_files
+ids_files = load_ids_files()
+
+if not ids_files:
+    st.error("Inga IDS-filer hittades i mappen /ids/.")
+else:
+    st.subheader("Välj regelset")
+    selected_ids = []
+    cols = st.columns(2)
+    for i, (name, data) in enumerate(ids_files.items()):
+        col = cols[i % 2]
+        with col:
+            title = name.replace("_", " ")
+            if st.checkbox(title, value=True):
+                selected_ids.append((name, data))
 
 # ── Filuppladdning ────────────────────────────────────────────────────────────
 st.markdown("---")
