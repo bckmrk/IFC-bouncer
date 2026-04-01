@@ -126,6 +126,9 @@ def load_ids_files():
                 ids_files[f.stem] = {"path": f, "ids": ids_obj}
             except Exception as e:
                 st.warning(f"Kunde inte ladda {f.name}: {e}")
+                st.code(open(f).read(), language="xml")
+    else:
+        st.error(f"Mappen {IDS_FOLDER} finns inte!")
     return ids_files
 
 
