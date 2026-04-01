@@ -1,1 +1,35 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ids xmlns="http://standards.buildingsmart.org/IDS" xmlns:xs="http://www.w3.org/2001/XMLSchema"><info><title>JM - Dörrkrav TypeID och TypeName</title><author>JM AB</author><date>2026-03-05</date></info><specifications><specification name="Dörr - TypeID ska följa namnstandard (VD, SD, D, BGV, EP, ED, FD eller GP)" ifcVersion="IFC2X3"><applicability minOccurs="0" maxOccurs="unbounded"><entity><name><simpleValue>IFCDOOR</simpleValue></name></entity></applicability><requirements><property cardinality="required" dataType="IFCTEXT"><propertySet><simpleValue>JM</simpleValue></propertySet><baseName><simpleValue>TypeID</simpleValue></baseName><value><xs:restriction base="xs:string"><xs:pattern value="(VD|SD|BGV|EP|ED|FD|GP|D).*"/></xs:restriction></value></property></requirements></specification></specifications></ids>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ids xmlns="http://standards.buildingsmart.org/IDS"
+     xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <info>
+    <title>JM - Dörrkrav TypeID och TypeName</title>
+    <author>JM AB</author>
+    <date>2026-03-05</date>
+  </info>
+  <specifications>
+    <specification
+      name="Dörr - TypeID ska följa namnstandard (VD, SD, D, BGV, EP, ED, FD eller GP)"
+      ifcVersion="IFC2X3">
+      <applicability minOccurs="0" maxOccurs="unbounded">
+        <entity>
+          <name>
+            <simpleValue>IFCDOOR</simpleValue>
+          </name>
+        </entity>
+      </applicability>
+      <requirements>
+        <property cardinality="required" dataType="IFCTEXT">
+          <propertySet>
+            <simpleValue>JM</simpleValue>
+          </propertySet>
+          <baseName>
+            <simpleValue>TypeID</simpleValue>
+          </baseName>
+          <value>
+            <simpleValue>(VD|SD|BGV|EP|ED|FD|GP|D).*</simpleValue>
+          </value>
+        </property>
+      </requirements>
+    </specification>
+  </specifications>
+</ids>
