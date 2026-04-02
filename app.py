@@ -9,6 +9,7 @@ import re
 import json
 import io
 import sys
+import traceback
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -123,28 +124,23 @@ def load_ids_files():
     ids_files = {}
     if IDS_FOLDER.exists():
         for f in sorted(IDS_FOLDER.glob("*.ids")):
-            captured = io.StringIO()
             try:
-                # Fånga stdout/stderr — ifctester skriver valideringsdetaljer dit
-                old_stdout, old_stderr = sys.stdout, sys.stderr
-                sys.stdout = captured
-                sys.stderr = captured
-                try:
-                    ids_obj = ids.open(str(f))
-                finally:
-                    sys.stdout, sys.stderr = old_stdout, old_stderr
-
+                ids_obj = ids.open(str(f))
                 ids_files[f.stem] = {"path": f, "ids": ids_obj}
             except Exception as e:
-                sys.stdout, sys.stderr = old_stdout, old_stderr
-                output = captured.getvalue().strip()
-                error_msg = str(e)
-                detail = ""
-                if output:
-                    detail = f"\n\n**Valideringsdetaljer:**\n```\n{output}\n```"
-                if hasattr(e, '__cause__') and e.__cause__:
-                    detail += f"\n\nOrsak: `{e.__cause__}`"
-                st.warning(f"Kunde inte ladda {f.name}: {error_msg}{detail}")
+                # Samla ALL tillgänglig felinformation
+                parts = [f"**Kunde inte ladda {f.name}:** {e}"]
+
+                # Visa underliggande orsak (xml_error, __cause__)
+                for attr in ("xml_error", "reason", "__cause__"):
+                    val = getattr(e, attr, None)
+                    if val:
+                        parts.append(f"**{attr}:** `{val}`")
+
+                # Visa fullständig traceback
+                parts.append(f"```\n{traceback.format_exc()}\n```")
+
+                st.warning("\n\n".join(parts))
     else:
         st.error(f"Mappen {IDS_FOLDER} finns inte!")
     return ids_files
