@@ -620,26 +620,9 @@ if run_button and uploaded_ifc is not None:
         st.session_state.last_results = all_results
         st.session_state.last_filename = uploaded_ifc.name
         st.session_state.last_timestamp = datetime.now().isoformat()
-        st.session_state.last_bcf_issues = bcf_issues
         st.session_state.last_new_exceptions = new_exceptions
-        st.session_state.last_ifc_file = ifc_file
 
-    except Exception as e:
-        st.error(f"Fel under validering: {str(e)}")
-        st.exception(e)
-    finally:
-        os.unlink(tmp_path)
-
-# ── Export ────────────────────────────────────────────────────────────────────
-if "last_results" in st.session_state:
-    st.markdown("---")
-    st.subheader("📥 Exportera resultat")
-
-    col_bcf, col_json, col_exc = st.columns(3)
-
-    with col_bcf:
-        bcf_issues = st.session_state.get("last_bcf_issues", [])
-        ifc_file = st.session_state.get("last_ifc_file")
+        # Generera BCF medan ifc_file fortfarande finns i minnet
         if bcf_issues:
             try:
                 bcf_file = BcfXml.create_new("IFC Bouncer")
@@ -659,17 +642,41 @@ if "last_results" in st.session_state:
                 bcf_path = tempfile.mktemp(suffix=".bcf")
                 bcf_file.save(bcf_path)
                 with open(bcf_path, "rb") as f:
-                    bcf_bytes = f.read()
+                    st.session_state.last_bcf_bytes = f.read()
                 os.unlink(bcf_path)
-                st.download_button(
-                    "📋 BCF (Solibri/Revit)",
-                    data=bcf_bytes,
-                    file_name=f"bouncer_{st.session_state.last_filename}_{datetime.now().strftime('%Y%m%d_%H%M')}.bcf",
-                    mime="application/octet-stream",
-                )
-                st.caption(f"{len(bcf_issues)} ärenden")
+                st.session_state.last_bcf_count = len(bcf_issues)
             except Exception as e:
-                st.error(f"BCF-export misslyckades: {e}")
+                st.session_state.last_bcf_bytes = None
+                st.session_state.last_bcf_count = 0
+                st.warning(f"BCF-generering misslyckades: {e}")
+        else:
+            st.session_state.last_bcf_bytes = None
+            st.session_state.last_bcf_count = 0
+
+    except Exception as e:
+        st.error(f"Fel under validering: {str(e)}")
+        st.exception(e)
+    finally:
+        os.unlink(tmp_path)
+
+# ── Export ────────────────────────────────────────────────────────────────────
+if "last_results" in st.session_state:
+    st.markdown("---")
+    st.subheader("📥 Exportera resultat")
+
+    col_bcf, col_json, col_exc = st.columns(3)
+
+    with col_bcf:
+        bcf_bytes = st.session_state.get("last_bcf_bytes")
+        bcf_count = st.session_state.get("last_bcf_count", 0)
+        if bcf_bytes:
+            st.download_button(
+                "📋 BCF (Solibri/Revit)",
+                data=bcf_bytes,
+                file_name=f"bouncer_{st.session_state.last_filename}_{datetime.now().strftime('%Y%m%d_%H%M')}.bcf",
+                mime="application/octet-stream",
+            )
+            st.caption(f"{bcf_count} ärenden")
         else:
             st.info("Inga fel — ingen BCF behövs. 🎉")
 
