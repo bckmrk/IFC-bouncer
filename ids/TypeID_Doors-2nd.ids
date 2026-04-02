@@ -3,7 +3,7 @@
   <info>
     <title>JM TypeID Dörrkrav</title>
     <description>Checks all doors for valid JM TypeID</description>
-    <author>JM AB</author>
+    <author>bim@jm.se</author>
     <date>2026-04-01</date>
     <purpose>JM type classification</purpose>
   </info>
