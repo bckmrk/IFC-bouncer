@@ -577,26 +577,24 @@ if run_button and uploaded_ifc is not None:
             all_results.append({"rule_set": "Avancerat", "rule": "Pset_*Common finns", "status": "PASS", "elements_checked": 0})
 
         # 8. BaseQuantities PropertySet finns
-        common_pset_map = {
-            "IfcObject": "BaseQuantities",
-        }
-missing_base_quantities = []
-for element in ifc_file.by_type("IfcObject"):
-    psets = ifcopenshell.util.element.get_psets(element)
-    if "BaseQuantities" not in psets:
-        missing_base_quantities.append({"element": element})
+        missing_base_quantities = []
+        for element in ifc_file.by_type("IfcObject"):
+            psets = ifcopenshell.util.element.get_psets(element)
+            if "BaseQuantities" not in psets:
+                missing_base_quantities.append({"element": element})
+        
+        if missing_base_quantities:
+            with st.expander(f"❌ **BaseQuantities saknas** — {len(missing_base_quantities)} element", expanded=False):
+                rows = [{"ID": f"#{r['element'].id()}", "Typ": r['element'].is_a(), "Namn": getattr(r['element'], 'Name', None) or "—"} for r in missing_base_quantities[:50]]
+                st.dataframe(rows, use_container_width=True, hide_index=True)
+            guids = [r['element'].GlobalId for r in missing_base_quantities if r['element'].GlobalId][:50]
+            if guids:
+                bcf_issues.append({"title": f"{len(missing_base_quantities)} element saknar BaseQuantities", "description": "PropertySet BaseQuantities saknas", "guids": guids, "first_entity": missing_base_quantities[0]["element"]})
+            all_results.append({"rule_set": "Avancerat", "rule": "BaseQuantities PropertySet finns", "status": "FAIL", "elements_checked": len(missing_base_quantities)})
+        else:
+            st.markdown("✅ **BaseQuantities PropertySet** — finns för alla IfcObject")
+            all_results.append({"rule_set": "Avancerat", "rule": "BaseQuantities PropertySet finns", "status": "PASS", "elements_checked": 0})
 
-if missing_base_quantities:
-    with st.expander(f"❌ **BaseQuantities saknas** — {len(missing_base_quantities)} element", expanded=False):
-        rows = [{"ID": f"#{r['element'].id()}", "Typ": r['element'].is_a(), "Namn": getattr(r['element'], 'Name', None) or "—"} for r in missing_base_quantities[:50]]
-        st.dataframe(rows, use_container_width=True, hide_index=True)
-    guids = [r['element'].GlobalId for r in missing_base_quantities if r['element'].GlobalId][:50]
-    if guids:
-        bcf_issues.append({"title": f"{len(missing_base_quantities)} element saknar BaseQuantities", "description": "PropertySet BaseQuantities saknas", "guids": guids, "first_entity": missing_base_quantities[0]["element"]})
-    all_results.append({"rule_set": "Avancerat", "rule": "BaseQuantities PropertySet finns", "status": "FAIL", "elements_checked": len(missing_base_quantities)})
-else:
-    st.markdown("✅ **BaseQuantities PropertySet** — finns för alla IfcObject")
-    all_results.append({"rule_set": "Avancerat", "rule": "BaseQuantities PropertySet finns", "status": "PASS", "elements_checked": 0})
         # ── Sammanfattning ────────────────────────────────────────────────────
         st.markdown("---")
         st.subheader("📊 Sammanfattning")
