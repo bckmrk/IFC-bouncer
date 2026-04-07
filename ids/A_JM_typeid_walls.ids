@@ -13,6 +13,7 @@
         <entity>
           <name>
             <simpleValue>IFCWALL</simpleValue>
+            <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
       </applicability>
@@ -32,6 +33,7 @@
         <entity>
           <name>
             <simpleValue>IFCWALL</simpleValue>
+            <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
       </applicability>
@@ -51,6 +53,7 @@
         <entity>
           <name>
             <simpleValue>IFCWALL</simpleValue>
+            <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
       </applicability>
@@ -70,6 +73,7 @@
         <entity>
           <name>
             <simpleValue>IFCWALL</simpleValue>
+            <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
         <property dataType="IFCLABEL">
