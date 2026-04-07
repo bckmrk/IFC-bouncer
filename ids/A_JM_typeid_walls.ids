@@ -137,7 +137,7 @@
               <xs:enumeration value="IWS-35i"/>
               <xs:enumeration value="IWS-39i"/>
               <xs:enumeration value="IWS-26i"/>
-              <xs:string value="TU.*"/>
+              <xs:enumeration  value="TU1x"/>
             </xs:restriction>
           </value>
         </property>
