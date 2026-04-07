@@ -224,8 +224,6 @@ with col2:
     run_pset_common = st.checkbox("Pset_*Common", value=True)
     run_bq = st.checkbox("BaseQuantities", value=True)
 
-: `{uploaded_ifc.name}`
-
 # ── Kör-knapp ─────────────────────────────────────────────────────────────────
 st.markdown("---")
 run_button = st.button("🚪 Kör validering", type="primary", disabled=uploaded_ifc is None)
