@@ -206,7 +206,26 @@ if uploaded_ifc:
         )
         st.stop()
     else:
-        st.success(f"✅ Filnamnet är korrekt: `{uploaded_ifc.name}`")
+        st.success(f"✅ Filnamnet är korrekt)
+
+
+# ── Val av kontroller (valsteg före validering) ────────────────────────────────
+st.markdown("---")
+st.subheader("🧪 Välj vilka kontroller som ska köras")
+
+col1, col2 = st.columns(2)
+with col1:
+    run_storeys = st.checkbox("Rätt våningsplan", value=True)
+    run_storey_heights = st.checkbox("Max två våningshöjder", value=True)
+    run_spaces = st.checkbox("Rum / Spaces", value=True)
+    run_windows = st.checkbox("Fönster", value=True)
+with col2:
+    run_doors = st.checkbox("Dörrar", value=True)
+    run_pset_jm = st.checkbox("PropertySet JM", value=True)
+    run_pset_common = st.checkbox("Pset_*Common", value=True)
+    run_bq = st.checkbox("BaseQuantities", value=True)
+
+: `{uploaded_ifc.name}`")
 
 # ── Kör-knapp ─────────────────────────────────────────────────────────────────
 st.markdown("---")
