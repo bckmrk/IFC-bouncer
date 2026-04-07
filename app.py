@@ -376,210 +376,207 @@ if run_button and uploaded_ifc is not None:
         st.subheader("🔍 Avancerade kontroller")
 
         if run_storeys:
-        # 1. Element tilldelade våningsplan
-
-        unassigned = []
-        for entity_type in ["IfcWall", "IfcDoor", "IfcWindow", "IfcSlab", "IfcColumn", "IfcBeam"]:
-            for element in ifc_file.by_type(entity_type):
-                container = ifcopenshell.util.element.get_container(element)
-                if container is None:
-                    unassigned.append(element)
-        if unassigned:
-            type_counts = {}
-            for e in unassigned:
-                t = e.is_a()
-                type_counts[t] = type_counts.get(t, 0) + 1
-            summary_text = ", ".join(f"{c}x {t}" for t, c in type_counts.items())
-            with st.expander(f"❌ **Element utan våningsplan** — {len(unassigned)} st", expanded=False):
-                rows = [{"ID": f"#{e.id()}", "Typ": e.is_a(), "Namn": getattr(e, 'Name', None) or "—", "TypeID": get_type_id(e)} for e in unassigned[:50]]
-                st.dataframe(rows, use_container_width=True, hide_index=True)
-            guids = [e.GlobalId for e in unassigned if e.GlobalId][:50]
-            if guids:
-                bcf_issues.append({
-                    "title": f"{len(unassigned)} element utan våningsplan",
-                    "description": summary_text,
-                    "guids": guids,
-                    "first_entity": unassigned[0],
-                })
-            all_results.append({"rule_set": "Avancerat", "rule": "Element tilldelade våningsplan", "status": "FAIL", "elements_checked": len(unassigned)})
-        else:
-            st.markdown("✅ **Element tilldelade våningsplan** — alla element tilldelade ett våningsplan")
-            all_results.append({"rule_set": "Avancerat", "rule": "Element tilldelade våningsplan", "status": "PASS", "elements_checked": 0})
-
-        if run_storey_heights:
-        # 2. Element spänner över max två våningshöjder
-
-        storeys = sorted(ifc_file.by_type("IfcBuildingStorey"), key=lambda s: s.Elevation or 0)
-        storey_elevations = [(s.Name or f"Våning {i}", s.Elevation or 0) for i, s in enumerate(storeys)]
-        multi_storey_issues = []
-        if len(storeys) >= 2:
-            max_span = storey_elevations[-1][1] - storey_elevations[0][1]
-            two_storey_height = None
-            if len(storeys) >= 3:
-                two_storey_height = storey_elevations[2][1] - storey_elevations[0][1]
-            else:
-                two_storey_height = max_span
-
-            for entity_type in ["IfcWall", "IfcColumn"]:
-                for element in ifc_file.by_type(entity_type):
-                    try:
-                        bb = ifcopenshell.util.element.get_psets(element)
-                        placement = getattr(element, 'ObjectPlacement', None)
-                        if placement is None:
-                            continue
-                        qtos = ifcopenshell.util.element.get_psets(element, qtos_only=True)
-                        height = None
-                        for qto in qtos.values():
-                            height = qto.get("Height") or qto.get("Length") or height
-                        if height and two_storey_height and height > two_storey_height * 1.1:
-                            multi_storey_issues.append({
-                                "ID": f"#{element.id()}",
-                                "Typ": element.is_a(),
-                                "Namn": getattr(element, 'Name', None) or "—",
-                                "TypeID": get_type_id(element),
-                                "Höjd (m)": f"{height:.2f}",
-                                "Max tillåtet (m)": f"{two_storey_height:.2f}",
-                                "_guid": element.GlobalId,
-                                "_entity": element,
+                    # 1. Element tilldelade våningsplan
+                    unassigned = []
+                    for entity_type in ["IfcWall", "IfcDoor", "IfcWindow", "IfcSlab", "IfcColumn", "IfcBeam"]:
+                        for element in ifc_file.by_type(entity_type):
+                            container = ifcopenshell.util.element.get_container(element)
+                            if container is None:
+                                unassigned.append(element)
+                    if unassigned:
+                        type_counts = {}
+                        for e in unassigned:
+                            t = e.is_a()
+                            type_counts[t] = type_counts.get(t, 0) + 1
+                        summary_text = ", ".join(f"{c}x {t}" for t, c in type_counts.items())
+                        with st.expander(f"❌ **Element utan våningsplan** — {len(unassigned)} st", expanded=False):
+                            rows = [{"ID": f"#{e.id()}", "Typ": e.is_a(), "Namn": getattr(e, 'Name', None) or "—", "TypeID": get_type_id(e)} for e in unassigned[:50]]
+                            st.dataframe(rows, use_container_width=True, hide_index=True)
+                        guids = [e.GlobalId for e in unassigned if e.GlobalId][:50]
+                        if guids:
+                            bcf_issues.append({
+                                "title": f"{len(unassigned)} element utan våningsplan",
+                                "description": summary_text,
+                                "guids": guids,
+                                "first_entity": unassigned[0],
                             })
-                    except Exception:
-                        continue
-
-        if multi_storey_issues:
-            with st.expander(f"❌ **Element spänner över mer än två våningar** — {len(multi_storey_issues)} st", expanded=False):
-                st.dataframe([{k: v for k, v in r.items() if not k.startswith("_")} for r in multi_storey_issues], use_container_width=True, hide_index=True)
-            guids = [r["_guid"] for r in multi_storey_issues if r["_guid"]]
-            if guids:
-                bcf_issues.append({
-                    "title": f"{len(multi_storey_issues)} element spänner över mer än två våningar",
-                    "description": "Element vars höjd överstiger två våningshöjder",
-                    "guids": guids,
-                    "first_entity": multi_storey_issues[0]["_entity"],
-                })
-            all_results.append({"rule_set": "Avancerat", "rule": "Max två våningshöjder", "status": "FAIL", "elements_checked": len(multi_storey_issues)})
-        else:
-            st.markdown("✅ **Max två våningshöjder** — inga element spänner över mer än två våningar")
-            all_results.append({"rule_set": "Avancerat", "rule": "Max två våningshöjder", "status": "PASS", "elements_checked": 0})
-
+                        all_results.append({"rule_set": "Avancerat", "rule": "Element tilldelade våningsplan", "status": "FAIL", "elements_checked": len(unassigned)})
+                    else:
+                        st.markdown("✅ **Element tilldelade våningsplan** — alla element tilldelade ett våningsplan")
+                        all_results.append({"rule_set": "Avancerat", "rule": "Element tilldelade våningsplan", "status": "PASS", "elements_checked": 0})
+            
+        if run_storey_heights:
+                    # 2. Element spänner över max två våningshöjder
+                    storeys = sorted(ifc_file.by_type("IfcBuildingStorey"), key=lambda s: s.Elevation or 0)
+                    storey_elevations = [(s.Name or f"Våning {i}", s.Elevation or 0) for i, s in enumerate(storeys)]
+                    multi_storey_issues = []
+                    if len(storeys) >= 2:
+                        max_span = storey_elevations[-1][1] - storey_elevations[0][1]
+                        two_storey_height = None
+                        if len(storeys) >= 3:
+                            two_storey_height = storey_elevations[2][1] - storey_elevations[0][1]
+                        else:
+                            two_storey_height = max_span
+            
+                        for entity_type in ["IfcWall", "IfcColumn"]:
+                            for element in ifc_file.by_type(entity_type):
+                                try:
+                                    bb = ifcopenshell.util.element.get_psets(element)
+                                    placement = getattr(element, 'ObjectPlacement', None)
+                                    if placement is None:
+                                        continue
+                                    qtos = ifcopenshell.util.element.get_psets(element, qtos_only=True)
+                                    height = None
+                                    for qto in qtos.values():
+                                        height = qto.get("Height") or qto.get("Length") or height
+                                    if height and two_storey_height and height > two_storey_height * 1.1:
+                                        multi_storey_issues.append({
+                                            "ID": f"#{element.id()}",
+                                            "Typ": element.is_a(),
+                                            "Namn": getattr(element, 'Name', None) or "—",
+                                            "TypeID": get_type_id(element),
+                                            "Höjd (m)": f"{height:.2f}",
+                                            "Max tillåtet (m)": f"{two_storey_height:.2f}",
+                                            "_guid": element.GlobalId,
+                                            "_entity": element,
+                                        })
+                                except Exception:
+                                    continue
+            
+                    if multi_storey_issues:
+                        with st.expander(f"❌ **Element spänner över mer än två våningar** — {len(multi_storey_issues)} st", expanded=False):
+                            st.dataframe([{k: v for k, v in r.items() if not k.startswith("_")} for r in multi_storey_issues], use_container_width=True, hide_index=True)
+                        guids = [r["_guid"] for r in multi_storey_issues if r["_guid"]]
+                        if guids:
+                            bcf_issues.append({
+                                "title": f"{len(multi_storey_issues)} element spänner över mer än två våningar",
+                                "description": "Element vars höjd överstiger två våningshöjder",
+                                "guids": guids,
+                                "first_entity": multi_storey_issues[0]["_entity"],
+                            })
+                        all_results.append({"rule_set": "Avancerat", "rule": "Max två våningshöjder", "status": "FAIL", "elements_checked": len(multi_storey_issues)})
+                    else:
+                        st.markdown("✅ **Max två våningshöjder** — inga element spänner över mer än två våningar")
+                        all_results.append({"rule_set": "Avancerat", "rule": "Max två våningshöjder", "status": "PASS", "elements_checked": 0})
+            
         if run_spaces:
-        # 3. Rum/spaces finns och har namn och golvyta
-
-        spaces = ifc_file.by_type("IfcSpace")
-        if len(spaces) == 0:
-            st.markdown("❌ **Rum/Spaces** — inga IfcSpace hittades i modellen")
-            bcf_issues.append({
-                "title": "Inga rum/spaces i modellen",
-                "description": "Noll IfcSpace-element hittades.",
-                "guids": [],
-                "first_entity": None,
-            })
-            all_results.append({"rule_set": "Avancerat", "rule": "Rum/spaces finns", "status": "FAIL", "elements_checked": 0})
-        else:
-            no_area = []
-            unnamed = []
-            for space in spaces:
-                area = get_pset_value(space, "Qto_SpaceBaseQuantities", "NetFloorArea")
-                if area is None or area <= 0:
-                    no_area.append(space)
-                if not space.Name or space.Name.strip() == "":
-                    unnamed.append(space)
-            space_issues = []
-            if no_area:
-                space_issues.append(f"{len(no_area)} utan NetFloorArea")
-            if unnamed:
-                space_issues.append(f"{len(unnamed)} utan namn")
-            if space_issues:
-                with st.expander(f"❌ **Rum/Spaces** — {len(spaces)} hittade, problem: {', '.join(space_issues)}", expanded=False):
-                    if no_area:
-                        st.markdown(f"**Saknar NetFloorArea:** {len(no_area)} rum")
-                        rows = [{"ID": f"#{s.id()}", "Namn": s.Name or "—", "LongName": getattr(s, 'LongName', None) or "—"} for s in no_area[:20]]
-                        st.dataframe(rows, use_container_width=True, hide_index=True)
-                    if unnamed:
-                        st.markdown(f"**Saknar namn:** {len(unnamed)} rum")
-                        rows = [{"ID": f"#{s.id()}"} for s in unnamed[:20]]
-                        st.dataframe(rows, use_container_width=True, hide_index=True)
-                problem_spaces = list(set(no_area + unnamed))
-                guids = [s.GlobalId for s in problem_spaces if s.GlobalId][:30]
-                if guids:
-                    bcf_issues.append({
-                        "title": f"Rum med problem: {', '.join(space_issues)}",
-                        "description": f"{len(spaces)} rum totalt",
-                        "guids": guids,
-                        "first_entity": problem_spaces[0],
-                    })
-                all_results.append({"rule_set": "Avancerat", "rule": "Rum/spaces fullständiga", "status": "FAIL", "elements_checked": len(spaces)})
-            else:
-                st.markdown(f"✅ **Rum/Spaces** — {len(spaces)} rum, alla med namn och golvyta")
-                all_results.append({"rule_set": "Avancerat", "rule": "Rum/spaces fullständiga", "status": "PASS", "elements_checked": len(spaces)})
-
+                    # 3. Rum/spaces finns och har namn och golvyta
+                    spaces = ifc_file.by_type("IfcSpace")
+                    if len(spaces) == 0:
+                        st.markdown("❌ **Rum/Spaces** — inga IfcSpace hittades i modellen")
+                        bcf_issues.append({
+                            "title": "Inga rum/spaces i modellen",
+                            "description": "Noll IfcSpace-element hittades.",
+                            "guids": [],
+                            "first_entity": None,
+                        })
+                        all_results.append({"rule_set": "Avancerat", "rule": "Rum/spaces finns", "status": "FAIL", "elements_checked": 0})
+                    else:
+                        no_area = []
+                        unnamed = []
+                        for space in spaces:
+                            area = get_pset_value(space, "Qto_SpaceBaseQuantities", "NetFloorArea")
+                            if area is None or area <= 0:
+                                no_area.append(space)
+                            if not space.Name or space.Name.strip() == "":
+                                unnamed.append(space)
+                        space_issues = []
+                        if no_area:
+                            space_issues.append(f"{len(no_area)} utan NetFloorArea")
+                        if unnamed:
+                            space_issues.append(f"{len(unnamed)} utan namn")
+                        if space_issues:
+                            with st.expander(f"❌ **Rum/Spaces** — {len(spaces)} hittade, problem: {', '.join(space_issues)}", expanded=False):
+                                if no_area:
+                                    st.markdown(f"**Saknar NetFloorArea:** {len(no_area)} rum")
+                                    rows = [{"ID": f"#{s.id()}", "Namn": s.Name or "—", "LongName": getattr(s, 'LongName', None) or "—"} for s in no_area[:20]]
+                                    st.dataframe(rows, use_container_width=True, hide_index=True)
+                                if unnamed:
+                                    st.markdown(f"**Saknar namn:** {len(unnamed)} rum")
+                                    rows = [{"ID": f"#{s.id()}"} for s in unnamed[:20]]
+                                    st.dataframe(rows, use_container_width=True, hide_index=True)
+                            problem_spaces = list(set(no_area + unnamed))
+                            guids = [s.GlobalId for s in problem_spaces if s.GlobalId][:30]
+                            if guids:
+                                bcf_issues.append({
+                                    "title": f"Rum med problem: {', '.join(space_issues)}",
+                                    "description": f"{len(spaces)} rum totalt",
+                                    "guids": guids,
+                                    "first_entity": problem_spaces[0],
+                                })
+                            all_results.append({"rule_set": "Avancerat", "rule": "Rum/spaces fullständiga", "status": "FAIL", "elements_checked": len(spaces)})
+                        else:
+                            st.markdown(f"✅ **Rum/Spaces** — {len(spaces)} rum, alla med namn och golvyta")
+                            all_results.append({"rule_set": "Avancerat", "rule": "Rum/spaces fullständiga", "status": "PASS", "elements_checked": len(spaces)})
+            
         if run_windows:
-        # 4. Fönster finns och sitter i väggar
-
-        windows = ifc_file.by_type("IfcWindow")
-        if len(windows) == 0:
-            st.markdown("❌ **Fönster** — inga IfcWindow hittades (trolig exportinställning saknas)")
-            bcf_issues.append({"title": "Inga fönster i modellen", "description": "Noll IfcWindow-element.", "guids": [], "first_entity": None})
-            all_results.append({"rule_set": "Avancerat", "rule": "Fönster finns och är värdbaserade", "status": "FAIL", "elements_checked": 0})
-        else:
-            orphan_windows = [w for w in windows if not (hasattr(w, "FillsVoids") and w.FillsVoids)]
-            if orphan_windows:
-                with st.expander(f"❌ **Fönster** — {len(orphan_windows)}/{len(windows)} sitter inte i vägg", expanded=False):
-                    rows = [{"ID": f"#{w.id()}", "Namn": getattr(w, 'Name', None) or "—", "TypeID": get_type_id(w)} for w in orphan_windows[:20]]
-                    st.dataframe(rows, use_container_width=True, hide_index=True)
-                guids = [w.GlobalId for w in orphan_windows if w.GlobalId][:30]
-                if guids:
-                    bcf_issues.append({"title": f"{len(orphan_windows)} fönster utan värd-vägg", "description": "Saknar IfcRelFillsElement", "guids": guids, "first_entity": orphan_windows[0]})
-                all_results.append({"rule_set": "Avancerat", "rule": "Fönster finns och är värdbaserade", "status": "FAIL", "elements_checked": len(windows)})
-            else:
-                st.markdown(f"✅ **Fönster** — {len(windows)} fönster, alla sitter i väggar")
-                all_results.append({"rule_set": "Avancerat", "rule": "Fönster finns och är värdbaserade", "status": "PASS", "elements_checked": len(windows)})
-
+                    # 4. Fönster finns och sitter i väggar
+                    windows = ifc_file.by_type("IfcWindow")
+                    if len(windows) == 0:
+                        st.markdown("❌ **Fönster** — inga IfcWindow hittades (trolig exportinställning saknas)")
+                        bcf_issues.append({"title": "Inga fönster i modellen", "description": "Noll IfcWindow-element.", "guids": [], "first_entity": None})
+                        all_results.append({"rule_set": "Avancerat", "rule": "Fönster finns och är värdbaserade", "status": "FAIL", "elements_checked": 0})
+                    else:
+                        orphan_windows = [w for w in windows if not (hasattr(w, "FillsVoids") and w.FillsVoids)]
+                        if orphan_windows:
+                            with st.expander(f"❌ **Fönster** — {len(orphan_windows)}/{len(windows)} sitter inte i vägg", expanded=False):
+                                rows = [{"ID": f"#{w.id()}", "Namn": getattr(w, 'Name', None) or "—", "TypeID": get_type_id(w)} for w in orphan_windows[:20]]
+                                st.dataframe(rows, use_container_width=True, hide_index=True)
+                            guids = [w.GlobalId for w in orphan_windows if w.GlobalId][:30]
+                            if guids:
+                                bcf_issues.append({"title": f"{len(orphan_windows)} fönster utan värd-vägg", "description": "Saknar IfcRelFillsElement", "guids": guids, "first_entity": orphan_windows[0]})
+                            all_results.append({"rule_set": "Avancerat", "rule": "Fönster finns och är värdbaserade", "status": "FAIL", "elements_checked": len(windows)})
+                        else:
+                            st.markdown(f"✅ **Fönster** — {len(windows)} fönster, alla sitter i väggar")
+                            all_results.append({"rule_set": "Avancerat", "rule": "Fönster finns och är värdbaserade", "status": "PASS", "elements_checked": len(windows)})
+            
         if run_doors:
-        # 5. Dörrar sitter i väggar
-
-        doors = ifc_file.by_type("IfcDoor")
-        if doors:
-            orphan_doors = [d for d in doors if not (hasattr(d, "FillsVoids") and d.FillsVoids)]
-            if orphan_doors:
-                with st.expander(f"❌ **Dörrar** — {len(orphan_doors)}/{len(doors)} sitter inte i vägg", expanded=False):
-                    rows = [{"ID": f"#{d.id()}", "Namn": getattr(d, 'Name', None) or "—", "TypeID": get_type_id(d)} for d in orphan_doors[:20]]
-                    st.dataframe(rows, use_container_width=True, hide_index=True)
-                guids = [d.GlobalId for d in orphan_doors if d.GlobalId][:30]
-                if guids:
-                    bcf_issues.append({"title": f"{len(orphan_doors)} dörrar utan värd-vägg", "description": "Saknar IfcRelFillsElement", "guids": guids, "first_entity": orphan_doors[0]})
-                all_results.append({"rule_set": "Avancerat", "rule": "Dörrar värdbaserade", "status": "FAIL", "elements_checked": len(doors)})
-            else:
-                st.markdown(f"✅ **Dörrar** — {len(doors)} dörrar, alla sitter i väggar")
-                all_results.append({"rule_set": "Avancerat", "rule": "Dörrar värdbaserade", "status": "PASS", "elements_checked": len(doors)})
-        else:
-            st.markdown("⚠️ **Dörrar** — inga IfcDoor hittades i modellen")
-            all_results.append({"rule_set": "Avancerat", "rule": "Dörrar värdbaserade", "status": "N/A", "elements_checked": 0})
-
+                    # 5. Dörrar sitter i väggar
+                    doors = ifc_file.by_type("IfcDoor")
+                    if doors:
+                        orphan_doors = [d for d in doors if not (hasattr(d, "FillsVoids") and d.FillsVoids)]
+                        if orphan_doors:
+                            with st.expander(f"❌ **Dörrar** — {len(orphan_doors)}/{len(doors)} sitter inte i vägg", expanded=False):
+                                rows = [{"ID": f"#{d.id()}", "Namn": getattr(d, 'Name', None) or "—", "TypeID": get_type_id(d)} for d in orphan_doors[:20]]
+                                st.dataframe(rows, use_container_width=True, hide_index=True)
+                            guids = [d.GlobalId for d in orphan_doors if d.GlobalId][:30]
+                            if guids:
+                                bcf_issues.append({"title": f"{len(orphan_doors)} dörrar utan värd-vägg", "description": "Saknar IfcRelFillsElement", "guids": guids, "first_entity": orphan_doors[0]})
+                            all_results.append({"rule_set": "Avancerat", "rule": "Dörrar värdbaserade", "status": "FAIL", "elements_checked": len(doors)})
+                        else:
+                            st.markdown(f"✅ **Dörrar** — {len(doors)} dörrar, alla sitter i väggar")
+                            all_results.append({"rule_set": "Avancerat", "rule": "Dörrar värdbaserade", "status": "PASS", "elements_checked": len(doors)})
+                    else:
+                        st.markdown("⚠️ **Dörrar** — inga IfcDoor hittades i modellen")
+                        all_results.append({"rule_set": "Avancerat", "rule": "Dörrar värdbaserade", "status": "N/A", "elements_checked": 0})
+            
         if run_pset_jm:
-        # 6. Propertyset JM finns
-
-        element_types = ["IfcWall", "IfcDoor", "IfcWindow", "IfcSlab", "IfcColumn", "IfcBeam"]
-        missing_jm = []
-        for entity_type in element_types:
-            for element in ifc_file.by_type(entity_type):
-                psets = ifcopenshell.util.element.get_psets(element)
-                if "JM" not in psets:
-                    missing_jm.append(element)
-        if missing_jm:
-            with st.expander(f"❌ **Propertyset JM saknas** — {len(missing_jm)} element", expanded=False):
-                rows = [{"ID": f"#{e.id()}", "Typ": e.is_a(), "Namn": getattr(e, 'Name', None) or "—"} for e in missing_jm[:50]]
-                st.dataframe(rows, use_container_width=True, hide_index=True)
-            guids = [e.GlobalId for e in missing_jm if e.GlobalId][:50]
-            if guids:
-                bcf_issues.append({"title": f"{len(missing_jm)} element saknar propertyset JM", "description": "JM-pset saknas", "guids": guids, "first_entity": missing_jm[0]})
-            all_results.append({"rule_set": "Avancerat", "rule": "Propertyset JM finns", "status": "FAIL", "elements_checked": len(missing_jm)})
+                    # 6. Propertyset JM finns
+                    element_types = ["IfcWall", "IfcDoor", "IfcWindow", "IfcSlab", "IfcColumn", "IfcBeam"]
+                    missing_jm = []
+                    for entity_type in element_types:
+                        for element in ifc_file.by_type(entity_type):
+                            psets = ifcopenshell.util.element.get_psets(element)
+                            if "JM" not in psets:
+                                missing_jm.append(element)
+                    if missing_jm:
+                        with st.expander(f"❌ **Propertyset JM saknas** — {len(missing_jm)} element", expanded=False):
+                            rows = [{"ID": f"#{e.id()}", "Typ": e.is_a(), "Namn": getattr(e, 'Name', None) or "—"} for e in missing_jm[:50]]
+                            st.dataframe(rows, use_container_width=True, hide_index=True)
+                        guids = [e.GlobalId for e in missing_jm if e.GlobalId][:50]
+                        if guids:
+                            bcf_issues.append({"title": f"{len(missing_jm)} element saknar propertyset JM", "description": "JM-pset saknas", "guids": guids, "first_entity": missing_jm[0]})
+                        all_results.append({"rule_set": "Avancerat", "rule": "Propertyset JM finns", "status": "FAIL", "elements_checked": len(missing_jm)})
+                    else:
+                        st.markdown("✅ **Propertyset JM** — finns på alla kontrollerade element")
+                        all_results.append({"rule_set": "Avancerat", "rule": "Propertyset JM finns", "status": "PASS", "elements_checked": 0})
+            
         else:
-            st.markdown("✅ **Propertyset JM** — finns på alla kontrollerade element")
-            all_results.append({"rule_set": "Avancerat", "rule": "Propertyset JM finns", "status": "PASS", "elements_checked": 0})
-
-        if run_pset_common:
-        # 7. Propertyset IfcCommon finns
- (Pset_WallCommon, Pset_DoorCommon etc.)
+            st.info(f'⏭️ Kontroll hoppad över: # 6. Propertyset JM finns')
+            all_results.append({
+                'rule_set': 'Avancerat', 'rule': '# 6. Propertyset JM finns', 'status': 'SKIPPED', 'elements_checked': 0
+            })
+        # 7. Propertyset IfcCommon finns (Pset_WallCommon, Pset_DoorCommon etc.)
         common_pset_map = {
             "IfcWall": "Pset_WallCommon",
             "IfcDoor": "Pset_DoorCommon",
@@ -607,26 +604,30 @@ if run_button and uploaded_ifc is not None:
             all_results.append({"rule_set": "Avancerat", "rule": "Pset_*Common finns", "status": "PASS", "elements_checked": 0})
 
         if run_bq:
-        # 8. BaseQuantities PropertySet finns
-
-        missing_base_quantities = []
-        for element in ifc_file.by_type("IfcObject"):
-            psets = ifcopenshell.util.element.get_psets(element)
-            if "BaseQuantities" not in psets:
-                missing_base_quantities.append({"element": element})
-        
-        if missing_base_quantities:
-            with st.expander(f"❌ **BaseQuantities saknas** — {len(missing_base_quantities)} element", expanded=False):
-                rows = [{"ID": f"#{r['element'].id()}", "Typ": r['element'].is_a(), "Namn": getattr(r['element'], 'Name', None) or "—"} for r in missing_base_quantities[:50]]
-                st.dataframe(rows, use_container_width=True, hide_index=True)
-            guids = [r['element'].GlobalId for r in missing_base_quantities if r['element'].GlobalId][:50]
-            if guids:
-                bcf_issues.append({"title": f"{len(missing_base_quantities)} element saknar BaseQuantities", "description": "PropertySet BaseQuantities saknas", "guids": guids, "first_entity": missing_base_quantities[0]["element"]})
-            all_results.append({"rule_set": "Avancerat", "rule": "BaseQuantities PropertySet finns", "status": "FAIL", "elements_checked": len(missing_base_quantities)})
+                    # 8. BaseQuantities PropertySet finns
+                    missing_base_quantities = []
+                    for element in ifc_file.by_type("IfcObject"):
+                        psets = ifcopenshell.util.element.get_psets(element)
+                        if "BaseQuantities" not in psets:
+                            missing_base_quantities.append({"element": element})
+                    
+                    if missing_base_quantities:
+                        with st.expander(f"❌ **BaseQuantities saknas** — {len(missing_base_quantities)} element", expanded=False):
+                            rows = [{"ID": f"#{r['element'].id()}", "Typ": r['element'].is_a(), "Namn": getattr(r['element'], 'Name', None) or "—"} for r in missing_base_quantities[:50]]
+                            st.dataframe(rows, use_container_width=True, hide_index=True)
+                        guids = [r['element'].GlobalId for r in missing_base_quantities if r['element'].GlobalId][:50]
+                        if guids:
+                            bcf_issues.append({"title": f"{len(missing_base_quantities)} element saknar BaseQuantities", "description": "PropertySet BaseQuantities saknas", "guids": guids, "first_entity": missing_base_quantities[0]["element"]})
+                        all_results.append({"rule_set": "Avancerat", "rule": "BaseQuantities PropertySet finns", "status": "FAIL", "elements_checked": len(missing_base_quantities)})
+                    else:
+                        st.markdown("✅ **BaseQuantities PropertySet** — finns för alla IfcObject")
+                        all_results.append({"rule_set": "Avancerat", "rule": "BaseQuantities PropertySet finns", "status": "PASS", "elements_checked": 0})
+            
         else:
-            st.markdown("✅ **BaseQuantities PropertySet** — finns för alla IfcObject")
-            all_results.append({"rule_set": "Avancerat", "rule": "BaseQuantities PropertySet finns", "status": "PASS", "elements_checked": 0})
-
+            st.info(f'⏭️ Kontroll hoppad över: # 8. BaseQuantities PropertySet finns')
+            all_results.append({
+                'rule_set': 'Avancerat', 'rule': '# 8. BaseQuantities PropertySet finns', 'status': 'SKIPPED', 'elements_checked': 0
+            })
         # ── Sammanfattning ────────────────────────────────────────────────────
         st.markdown("---")
         st.subheader("📊 Sammanfattning")
