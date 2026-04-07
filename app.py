@@ -577,6 +577,9 @@ if run_button and uploaded_ifc is not None:
             all_results.append({"rule_set": "Avancerat", "rule": "Pset_*Common finns", "status": "PASS", "elements_checked": 0})
 
         # 8. BaseQuantities PropertySet finns
+        common_pset_map = {
+            "IfcObject": "BaseQuantities",
+        }
 missing_base_quantities = []
 for element in ifc_file.by_type("IfcObject"):
     psets = ifcopenshell.util.element.get_psets(element)
