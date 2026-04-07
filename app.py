@@ -224,7 +224,7 @@ with col2:
     run_pset_common = st.checkbox("Pset_*Common", value=True)
     run_bq = st.checkbox("BaseQuantities", value=True)
 
-: `{uploaded_ifc.name}`")
+: `{uploaded_ifc.name}`)
 
 # ── Kör-knapp ─────────────────────────────────────────────────────────────────
 st.markdown("---")
