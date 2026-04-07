@@ -198,7 +198,6 @@ uploaded_ifc = st.file_uploader("Ladda upp IFC-fil", type=["ifc"])
 st.caption("Filnamnet måste följa formatet: `A-40-V-0000.ifc` — t.ex. `A-40-V-1234.ifc`")
 
 # ── Filnamnskontroll ──────────────────────────────────────────────────────────
-
 if uploaded_ifc:
     if not check_filename(uploaded_ifc.name):
         st.error(
@@ -208,8 +207,7 @@ if uploaded_ifc:
         st.stop()
     else:
         st.success(f"✅ Filnamnet är korrekt: {uploaded_ifc.name}")
-
-
+``
 # ── Val av kontroller (valsteg före validering) ────────────────────────────────
 st.markdown("---")
 st.subheader("🧪 Välj vilka kontroller som ska köras")
