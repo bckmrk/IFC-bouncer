@@ -1,122 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ids xmlns="http://standards.buildingsmart.org/IDS"
-     xmlns:xs="http://www.w3.org/2001/XMLSchema">
-
+<ids xmlns="http://standards.buildingsmart.org/IDS" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://standards.buildingsmart.org/IDS http://standards.buildingsmart.org/IDS/1.0/ids.xsd">
   <info>
     <title>A - JM TypeID Walls</title>
-    <description>
-      Checks all walls for valid JM TypeID and TypeName.
-    </description>
+    <description>Checks all walls for valid JM TypeID and TypeName.</description>
     <author>bim@jm.se</author>
     <date>2025-01-15</date>
+    <purpose>JM type classification</purpose>
   </info>
-
-  <specification name="JM TypeID – Walls">
-
-    <!-- Applicability: BOTH wall classes -->
-    <applicability>
-      <entity>
-        <name>
-          <simpleValue>IfcWall</simpleValue>
-        </name>
-      </entity>
-      <entity>
-        <name>
-          <simpleValue>IfcWallStandardCase</simpleValue>
-        </name>
-      </entity>
-    </applicability>
-
-    <requirements>
-
-      <!-- JM.TypeID -->
-      <property dataType="IFCLABEL"
-                cardinality="required"
-                instructions="TypeID must be one of the approved IWS codes or start with TU">
-
-        <propertySet>
-          <simpleValue>JM</simpleValue>
-        </propertySet>
-
-        <baseName>
-          <simpleValue>TypeID</simpleValue>
-        </baseName>
-
-        <value>
-          <xs:restriction base="xs:string">
-
-            <!-- ALL ORIGINAL ENUMERATIONS – UNCHANGED -->
-            <xs:enumeration value="IWS-01"/>
-            <xs:enumeration value="IWS-03"/>
-            <xs:enumeration value="IWS-03i"/>
-            <xs:enumeration value="IWS-06"/>
-            <xs:enumeration value="IWS-10"/>
-            <xs:enumeration value="IWS-13"/>
-            <xs:enumeration value="IWS-13i"/>
-            <xs:enumeration value="IWS-16"/>
-            <xs:enumeration value="IWS-16i"/>
-            <xs:enumeration value="IWS-20"/>
-            <xs:enumeration value="IWS-25"/>
-            <xs:enumeration value="IWS-26"/>
-            <xs:enumeration value="IWS-29"/>
-            <xs:enumeration value="IWS-35"/>
-            <xs:enumeration value="IWS-39"/>
-            <xs:enumeration value="IWS-44"/>
-            <xs:enumeration value="IWS-45"/>
-            <xs:enumeration value="IWS-54"/>
-            <xs:enumeration value="IWS-64"/>
-            <xs:enumeration value="IWS-73"/>
-            <xs:enumeration value="IWS-84"/>
-            <xs:enumeration value="IWS-85"/>
-            <xs:enumeration value="IWS-96"/>
-            <xs:enumeration value="IWS-97"/>
-            <xs:enumeration value="IWS-98"/>
-            <xs:enumeration value="IWS-99"/>
-            <xs:enumeration value="IWS-103"/>
-            <xs:enumeration value="IWS-112"/>
-            <xs:enumeration value="IWS-117"/>
-            <xs:enumeration value="IWS-122"/>
-            <xs:enumeration value="IWS-123"/>
-            <xs:enumeration value="IWS-125"/>
-            <xs:enumeration value="IWS-135"/>
-            <xs:enumeration value="IWS-145"/>
-            <xs:enumeration value="IWS-155"/>
-            <xs:enumeration value="IWS-165"/>
-            <xs:enumeration value="IWS-166"/>
-            <xs:enumeration value="IWS-175"/>
-            <xs:enumeration value="IWS-185"/>
-            <xs:enumeration value="IWS-194"/>
-            <xs:enumeration value="IWS-198"/>
-            <xs:enumeration value="IWS-25i"/>
-            <xs:enumeration value="IWS-29i"/>
-            <xs:enumeration value="IWS-35i"/>
-            <xs:enumeration value="IWS-39i"/>
-            <xs:enumeration value="IWS-26i"/>
-
-            <!-- REPLACEMENT FOR TU1x -->
-            <xs:pattern value="^TU.*$"/>
-
-          </xs:restriction>
-        </value>
-      </property>
-
-      <!-- JM.TypeName -->
-      <property dataType="IFCLABEL"
-                cardinality="required"
-                instructions="Walls must have JM TypeName">
-
-        <propertySet>
-          <simpleValue>JM</simpleValue>
-        </propertySet>
-
-        <baseName>
-          <simpleValue>TypeName</simpleValue>
-        </baseName>
-
-      </property>
-
-    </requirements>
-
-  </specification>
-
+  <specifications>
+    <specification name="All walls must have JM TypeID" ifcVersion="IFC2X3 IFC4">
+      <applicability minOccurs="0" maxOccurs="unbounded">
+        <entity>
+          <name>
+            <simpleValue>IFCWALL</simpleValue>
+          </name>
+        </entity>
+      </applicability>
+      <requirements>
+        <property dataType="IFCLABEL" cardinality="required" instructions="Every wall must have a TypeID in the JM PropertySet">
+          <propertySet>
+            <simpleValue>JM</simpleValue>
+          </propertySet>
+          <baseName>
+            <simpleValue>TypeID</simpleValue>
+          </baseName>
+        </property>
+      </requirements>
+    </specification>
+    <specification name="All walls must have JM ClassCodeBuildingElement" ifcVersion="IFC2X3 IFC4">
+      <applicability minOccurs="0" maxOccurs="unbounded">
+        <entity>
+          <name>
+            <simpleValue>IFCWALL</simpleValue>
+          </name>
+        </entity>
+      </applicability>
+      <requirements>
+        <property dataType="IFCLABEL" cardinality="required" instructions="Every wall must have ClassCodeBuildingElement in JM pset">
+          <propertySet>
+            <simpleValue>JM</simpleValue>
+          </propertySet>
+          <baseName>
+            <simpleValue>ClassCodeBuildingElement</simpleValue>
+          </baseName>
+        </property>
+      </requirements>
+    </specification>
+    <specification name="All walls must have JM TypeName" ifcVersion="IFC2X3 IFC4">
+      <applicability minOccurs="0" maxOccurs="unbounded">
+        <entity>
+          <name>
+            <simpleValue>IFCWALL</simpleValue>
+          </name>
+        </entity>
+      </applicability>
+      <requirements>
+        <property dataType="IFCLABEL" cardinality="required" instructions="Every wall must have TypeName in JM pset">
+          <propertySet>
+            <simpleValue>JM</simpleValue>
+          </propertySet>
+          <baseName>
+            <simpleValue>TypeName</simpleValue>
+          </baseName>
+        </property>
+      </requirements>
+    </specification>
+    <specification name="Wall TypeID must be an approved IWS code" ifcVersion="IFC2X3 IFC4">
+      <applicability minOccurs="0" maxOccurs="unbounded">
+        <entity>
+          <name>
+            <simpleValue>IFCWALL</simpleValue>
+          </name>
+        </entity>
+        <property dataType="IFCLABEL">
+          <propertySet>
+            <simpleValue>JM</simpleValue>
+          </propertySet>
+          <baseName>
+            <simpleValue>TypeID</simpleValue>
+          </baseName>
+        </property>
+      </applicability>
+      <requirements>
+        <property dataType="IFCLABEL" cardinality="required" instructions="TypeID must be one of the approved IWS codes">
+          <propertySet>
+            <simpleValue>JM</simpleValue>
+          </propertySet>
+          <baseName>
+            <simpleValue>TypeID</simpleValue>
+          </baseName>
+          <value>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="IWS-01"/>
+              <xs:enumeration value="IWS-03"/>
+              <xs:enumeration value="IWS-03i"/>
+              <xs:enumeration value="IWS-06"/>
+              <xs:enumeration value="IWS-10"/>
+              <xs:enumeration value="IWS-13"/>
+              <xs:enumeration value="IWS-13i"/>
+              <xs:enumeration value="IWS-16"/>
+              <xs:enumeration value="IWS-16i"/>
+              <xs:enumeration value="IWS-20"/>
+              <xs:enumeration value="IWS-25"/>
+              <xs:enumeration value="IWS-26"/>
+              <xs:enumeration value="IWS-29"/>
+              <xs:enumeration value="IWS-35"/>
+              <xs:enumeration value="IWS-39"/>
+              <xs:enumeration value="IWS-44"/>
+              <xs:enumeration value="IWS-45"/>
+              <xs:enumeration value="IWS-54"/>
+              <xs:enumeration value="IWS-64"/>
+              <xs:enumeration value="IWS-73"/>
+              <xs:enumeration value="IWS-84"/>
+              <xs:enumeration value="IWS-85"/>
+              <xs:enumeration value="IWS-96"/>
+              <xs:enumeration value="IWS-97"/>
+              <xs:enumeration value="IWS-98"/>
+              <xs:enumeration value="IWS-99"/>
+              <xs:enumeration value="IWS-103"/>
+              <xs:enumeration value="IWS-112"/>
+              <xs:enumeration value="IWS-117"/>
+              <xs:enumeration value="IWS-122"/>
+              <xs:enumeration value="IWS-123"/>
+              <xs:enumeration value="IWS-125"/>
+              <xs:enumeration value="IWS-135"/>
+              <xs:enumeration value="IWS-145"/>
+              <xs:enumeration value="IWS-155"/>
+              <xs:enumeration value="IWS-165"/>
+              <xs:enumeration value="IWS-166"/>
+              <xs:enumeration value="IWS-175"/>
+              <xs:enumeration value="IWS-185"/>
+              <xs:enumeration value="IWS-194"/>
+              <xs:enumeration value="IWS-198"/>
+              <xs:enumeration value="IWS-25i"/>
+              <xs:enumeration value="IWS-29i"/>
+              <xs:enumeration value="IWS-35i"/>
+              <xs:enumeration value="IWS-39i"/>
+              <xs:enumeration value="IWS-26i"/>
+            </xs:restriction>
+          </value>
+        </property>
+      </requirements>
+    </specification>
+  </specifications>
 </ids>
