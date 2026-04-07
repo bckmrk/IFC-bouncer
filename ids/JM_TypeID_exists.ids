@@ -8,11 +8,11 @@
 
   <ids:info>
     <ids:title>JM TypeID – All Objects</ids:title>
+    <ids:version>1.0</ids:version>
     <ids:description>Checks that all IFC objects have JM.TypeID defined</ids:description>
     <ids:author>bim@jm.se</ids:author>
     <ids:date>2025-04-07</ids:date>
     <ids:purpose>JM type classification</ids:purpose>
-    <ids:version>1.0</ids:version>
   </ids:info>
 
   <ids:specification name="JM TypeID exists">
