@@ -15,6 +15,13 @@
             <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
+
+  <entity>
+    <name>
+      <simpleValue>IfcWall</simpleValue>
+    </name>
+  </entity>
+
       </applicability>
       <requirements>
         <property dataType="IFCLABEL" cardinality="required" instructions="Every wall must have a TypeID in the JM PropertySet">
@@ -34,6 +41,13 @@
             <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
+
+  <entity>
+    <name>
+      <simpleValue>IfcWall</simpleValue>
+    </name>
+  </entity>
+
       </applicability>
       <requirements>
         <property dataType="IFCLABEL" cardinality="required" instructions="Every wall must have ClassCodeBuildingElement in JM pset">
@@ -53,6 +67,13 @@
             <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
+
+  <entity>
+    <name>
+      <simpleValue>IfcWall</simpleValue>
+    </name>
+  </entity>
+
       </applicability>
       <requirements>
         <property dataType="IFCLABEL" cardinality="required" instructions="Every wall must have TypeName in JM pset">
@@ -71,6 +92,13 @@
           <name>
             <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
+
+  <entity>
+    <name>
+      <simpleValue>IfcWall</simpleValue>
+    </name>
+  </entity>
+
         </entity>
         <property dataType="IFCLABEL">
           <propertySet>
