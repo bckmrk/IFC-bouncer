@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ids:ids
+    xmlns:ids="http://standards.buildingsmart.org/IDS"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://standards.buildingsmart.org/IDS https://standards.buildingsmart.org/IDS/1.0/ids.xsd"
+    version="1.0">
+
+  <!--
+    JM TypeID All Objects
+    Checks all objects for existing JM TypeID.
+    bim@jm.se
+    2025-04-07
+  -->
+
+  <ids:specification name="JM TypeID - All Objects">
+    <ids:applicability>
+      <!-- Applies to ALL IFC objects -->
+      <ids:entity>
+        <ids:name>IfcObject</ids:name>
+      </ids:entity>
+    </ids:applicability>
+
+    <ids:requirements>
+      <ids:property>
+        <ids:propertySet>
+          <ids:name>JM</ids:name>
+        </ids:propertySet>
+        <ids:name>TypeID</ids:name>
+        <ids:existence>
+          <ids:required>true</ids:required>
+        </ids:existence>
+      </ids:property>
+    </ids:requirements>
+  </ids:specification>
+</ids:ids>
