@@ -375,7 +375,9 @@ if run_button and uploaded_ifc is not None:
         st.markdown("---")
         st.subheader("🔍 Avancerade kontroller")
 
+        if run_storeys:
         # 1. Element tilldelade våningsplan
+
         unassigned = []
         for entity_type in ["IfcWall", "IfcDoor", "IfcWindow", "IfcSlab", "IfcColumn", "IfcBeam"]:
             for element in ifc_file.by_type(entity_type):
@@ -404,7 +406,9 @@ if run_button and uploaded_ifc is not None:
             st.markdown("✅ **Element tilldelade våningsplan** — alla element tilldelade ett våningsplan")
             all_results.append({"rule_set": "Avancerat", "rule": "Element tilldelade våningsplan", "status": "PASS", "elements_checked": 0})
 
+        if run_storey_heights:
         # 2. Element spänner över max två våningshöjder
+
         storeys = sorted(ifc_file.by_type("IfcBuildingStorey"), key=lambda s: s.Elevation or 0)
         storey_elevations = [(s.Name or f"Våning {i}", s.Elevation or 0) for i, s in enumerate(storeys)]
         multi_storey_issues = []
@@ -457,7 +461,9 @@ if run_button and uploaded_ifc is not None:
             st.markdown("✅ **Max två våningshöjder** — inga element spänner över mer än två våningar")
             all_results.append({"rule_set": "Avancerat", "rule": "Max två våningshöjder", "status": "PASS", "elements_checked": 0})
 
+        if run_spaces:
         # 3. Rum/spaces finns och har namn och golvyta
+
         spaces = ifc_file.by_type("IfcSpace")
         if len(spaces) == 0:
             st.markdown("❌ **Rum/Spaces** — inga IfcSpace hittades i modellen")
@@ -506,7 +512,9 @@ if run_button and uploaded_ifc is not None:
                 st.markdown(f"✅ **Rum/Spaces** — {len(spaces)} rum, alla med namn och golvyta")
                 all_results.append({"rule_set": "Avancerat", "rule": "Rum/spaces fullständiga", "status": "PASS", "elements_checked": len(spaces)})
 
+        if run_windows:
         # 4. Fönster finns och sitter i väggar
+
         windows = ifc_file.by_type("IfcWindow")
         if len(windows) == 0:
             st.markdown("❌ **Fönster** — inga IfcWindow hittades (trolig exportinställning saknas)")
@@ -526,7 +534,9 @@ if run_button and uploaded_ifc is not None:
                 st.markdown(f"✅ **Fönster** — {len(windows)} fönster, alla sitter i väggar")
                 all_results.append({"rule_set": "Avancerat", "rule": "Fönster finns och är värdbaserade", "status": "PASS", "elements_checked": len(windows)})
 
+        if run_doors:
         # 5. Dörrar sitter i väggar
+
         doors = ifc_file.by_type("IfcDoor")
         if doors:
             orphan_doors = [d for d in doors if not (hasattr(d, "FillsVoids") and d.FillsVoids)]
@@ -545,7 +555,9 @@ if run_button and uploaded_ifc is not None:
             st.markdown("⚠️ **Dörrar** — inga IfcDoor hittades i modellen")
             all_results.append({"rule_set": "Avancerat", "rule": "Dörrar värdbaserade", "status": "N/A", "elements_checked": 0})
 
+        if run_pset_jm:
         # 6. Propertyset JM finns
+
         element_types = ["IfcWall", "IfcDoor", "IfcWindow", "IfcSlab", "IfcColumn", "IfcBeam"]
         missing_jm = []
         for entity_type in element_types:
@@ -565,7 +577,9 @@ if run_button and uploaded_ifc is not None:
             st.markdown("✅ **Propertyset JM** — finns på alla kontrollerade element")
             all_results.append({"rule_set": "Avancerat", "rule": "Propertyset JM finns", "status": "PASS", "elements_checked": 0})
 
-        # 7. Propertyset IfcCommon finns (Pset_WallCommon, Pset_DoorCommon etc.)
+        if run_pset_common:
+        # 7. Propertyset IfcCommon finns
+ (Pset_WallCommon, Pset_DoorCommon etc.)
         common_pset_map = {
             "IfcWall": "Pset_WallCommon",
             "IfcDoor": "Pset_DoorCommon",
@@ -592,7 +606,9 @@ if run_button and uploaded_ifc is not None:
             st.markdown("✅ **Pset_*Common** — finns på alla kontrollerade element")
             all_results.append({"rule_set": "Avancerat", "rule": "Pset_*Common finns", "status": "PASS", "elements_checked": 0})
 
+        if run_bq:
         # 8. BaseQuantities PropertySet finns
+
         missing_base_quantities = []
         for element in ifc_file.by_type("IfcObject"):
             psets = ifcopenshell.util.element.get_psets(element)
