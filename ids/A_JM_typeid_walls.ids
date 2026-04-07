@@ -12,7 +12,6 @@
       <applicability minOccurs="0" maxOccurs="unbounded">
         <entity>
           <name>
-            <simpleValue>IFCWALL</simpleValue>
             <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
@@ -32,7 +31,6 @@
       <applicability minOccurs="0" maxOccurs="unbounded">
         <entity>
           <name>
-            <simpleValue>IFCWALL</simpleValue>
             <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
@@ -52,7 +50,6 @@
       <applicability minOccurs="0" maxOccurs="unbounded">
         <entity>
           <name>
-            <simpleValue>IFCWALL</simpleValue>
             <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
@@ -72,7 +69,6 @@
       <applicability minOccurs="0" maxOccurs="unbounded">
         <entity>
           <name>
-            <simpleValue>IFCWALL</simpleValue>
             <simpleValue>IfcWallStandardCase</simpleValue>
           </name>
         </entity>
