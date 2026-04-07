@@ -206,7 +206,7 @@ if uploaded_ifc:
         )
         st.stop()
     else:
-        st.success(f"✅ Filnamnet är korrekt)
+        st.success(f"✅ Filnamnet är korrekt")
 
 
 # ── Val av kontroller (valsteg före validering) ────────────────────────────────
