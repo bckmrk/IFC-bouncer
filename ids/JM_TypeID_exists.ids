@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ids:ids
-  xmlns:ids="http://standards.buildingsmart.org/IDS"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="
-    http://standards.buildingsmart.org/IDS
-    https://standards.buildingsmart.org/IDS/1.0/ids.xsd">
-
+<ids:ids xmlns:ids="http://standards.buildingsmart.org/IDS" 
+         xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://standards.buildingsmart.org/IDS https://standards.buildingsmart.org/IDS/1.0/ids.xsd">
+  
   <ids:info>
     <ids:title>JM TypeID – All Objects</ids:title>
     <ids:version>1.0</ids:version>
@@ -15,24 +13,27 @@
     <ids:purpose>JM type classification</ids:purpose>
   </ids:info>
 
-  <ids:specification name="JM TypeID exists">
-    <ids:applicability>
-      <ids:entity>
-        <ids:name>IfcObject</ids:name>
-      </ids:entity>
-    </ids:applicability>
+  <ids:specifications>
+    <ids:specification name="JM TypeID exists" ifcVersion="IFC2X3">
+      <ids:applicability>
+        <ids:entity>
+          <ids:name>
+            <ids:simpleValue>IFCOBJECT</ids:simpleValue>
+          </ids:name>
+        </ids:entity>
+      </ids:applicability>
 
-    <ids:requirements>
-      <ids:property>
-        <ids:propertySet>
-          <ids:name>JM</ids:name>
-        </ids:propertySet>
-        <ids:name>TypeID</ids:name>
-        <ids:existence>
-          <ids:required>true</ids:required>
-        </ids:existence>
-      </ids:property>
-    </ids:requirements>
-  </ids:specification>
+      <ids:requirements>
+        <ids:property cardinality="required">
+          <ids:propertySet>
+            <ids:simpleValue>JM</ids:simpleValue>
+          </ids:propertySet>
+          <ids:baseName>
+            <ids:simpleValue>TypeID</ids:simpleValue>
+          </ids:baseName>
+        </ids:property>
+      </ids:requirements>
+    </ids:specification>
+  </ids:specifications>
 
 </ids:ids>
