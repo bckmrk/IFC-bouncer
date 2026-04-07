@@ -705,19 +705,3 @@ if "last_results" in st.session_state:
             st.caption(f"{len(unique)} fel att granska")
         else:
             st.info("Inga fel att lägga till som undantag. 🎉")
-
-
-# --- BaseQuantities soft check (auto-added) ---
-
-def summarize_basequantities_by_class(ifc_file):
-    missing = {}
-    import ifcopenshell.util.element
-    for entity in ifc_file:
-        if not entity.is_a("IfcBuildingElement"):
-            continue
-        psets = ifcopenshell.util.element.get_psets(entity)
-        has_bq = any(k.lower().endswith("basequantities") for k in psets.keys())
-        if not has_bq:
-            cls = entity.is_a()
-            missing[cls] = missing.get(cls, 0) + 1
-    return missing
